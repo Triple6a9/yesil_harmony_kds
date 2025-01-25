@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geçmiş Veriler</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <img src="img/YH_logo.jpeg" alt="logo" id="logo">
+        </div>
+        <div class="menu">
+            <select id="alanDropdown" class="dropdown"><option value="">Seçiniz</option>
+            </select>
+            <button id="GV" onclick="window.location.href='/GecmisVeri.html'">GEÇMİŞ VERİLER</button>
+            <button onclick="window.location.href='/Istatistik.html'">İSTATİSTİK</button>
+            <button onclick="window.location.href='/Optimizasyon.html'">OPTİMİZASYON</button>
+        </div>
+        <div id="datetime" class="datetime"></div>
+    </div>
+
+    <div class="tablo">
+        <h1>Geçmiş Veriler</h1>
+        <label for="time-range">Zaman Aralığı Seçin:</label>
+        <select id="range">
+            <option value="yearly">Yıllık</option>
+            <option value="six_months">6 Aylık</option>
+            <option value="three_months">3 Aylık</option>
+            <option value="monthly">1 Aylık</option>
+            <option value="daily">Günlük</option>
+        </select>
+    </div>
+
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>veriID</th>
+                <th>alanID</th>
+                <th>zaman</th>
+                <th>isik</th>
+                <th>sicaklik</th>
+                <th>nem</th>
+                <th>ruzgar_hizi</th>
+                <th>su_seviyesi</th>
+            </tr>
+        </thead>
+        <tbody>
+ 
+        </tbody>
+    </table>
+
+    <script src="Main.js"></script>
+    <script>
+
+    fetchData(1); 
+
+    // Alan seçildiğinde veriyi çek
+    alanDropdown.addEventListener('change', () => {
+        fetchData(alanDropdown.value); 
+    });
+    </script>
+    <script>
+        // Logo'ya tıklayınca Ana Sayfaya donuyo
+        document.getElementById('logo').addEventListener('click', function() {
+        window.location.href = 'index.html'; 
+        });
+    </script>
+
+    <script>
+        const alanDropdown = document.getElementById('alanDropdown');
+        const rangeSelect = document.getElementById('range');
+        const tableBody = document.querySelector('#data-table tbody');
+
+        // Alanları doldur
+        fetch('http://localhost:3000/alanlar')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(alan => {
+                    const option = document.createElement('option');
+                    option.value = alan.alanID;
+                    option.textContent = `Alan ${alan.alanID}`;
+                    alanDropdown.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Alanları yükleme hatası:', error));
+
+        // Verileri al ve tabloyu güncelle
+        function fetchData() {
+            const alanID = alanDropdown.value;
+            const zamanAraligi = rangeSelect.value;
+
+            fetch(`http://localhost:3000/veriler?alanID=${alanID}&zamanAraligi=${zamanAraligi}`)
+                .then(response => response.json())
+                .then(data => {
+                    tableBody.innerHTML = '';
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                    <td>${row.veriID}</td>
+                    <td>${row.alanID}</td>
+                    <td>${row.zaman}</td>
+                    <td>${row.isik}</td>
+                    <td>${row.sicaklik}</td>
+                    <td>${row.nem}</td>
+                    <td>${row.ruzgar_hizi}</td>
+                    <td>${row.su_seviyesi}</td>
+                `;
+                        tableBody.appendChild(tr);
+                    });
+                })
+                .catch(error => console.error('Verileri yükleme hatası:', error));
+        }
+
+        // Alan ve zaman seçildiğinde veriyi çek
+        alanDropdown.addEventListener('change', fetchData);
+        rangeSelect.addEventListener('change', fetchData);
+
+        // Sayfa yüklendiğinde varsayılan verileri al
+        window.onload = fetchData;
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Optimizasyon</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">
+      <img src="img/YH_logo.jpeg" alt="logo" id="logo" />
+    </div>
+    <div class="menu">
+      <select id="alanDropdown" class="dropdown">
+        <option value="">Seçiniz</option>
+        <option value="Alan 1">Alan 1</option>
+        <option value="Alan 2">Alan 2</option>
+        <option value="Alan 3">Alan 3</option>
+      </select>
+      <button onclick="window.location.href='/GecmisVeri.html'">GEÇMİŞ VERİLER</button>
+      <button onclick="window.location.href='/Istatistik.html'">İSTATİSTİK</button>
+      <button id="Op" onclick="window.location.href='/Optimizasyon.html'">OPTİMİZASYON</button>
+    </div>
+    <div id="datetime" class="datetime"></div>
+  </div>
+  <h1>Optimizasyon</h1>
+  <div class="container">
+    <button id="kontrolEt" class="btn">Kontrol Et</button>
+  </div>
+  <div id="sonuc" class="result-box"></div>
+
+  <script src="Main.js"></script>
+  <script>
+    // Logo'ya tıklanınca yönlendirme
+    document.getElementById("logo").addEventListener("click", function () {
+      window.location.href = "index.html";
+    });
+
+    // "Kontrol Et" butonuna tıklama olayını dinleyin
+    document.getElementById("kontrolEt").addEventListener("click", function () {
+      const dropdown = document.getElementById("alanDropdown");
+      const selectedAlan = dropdown.value;
+      const sonucDiv = document.getElementById("sonuc");
+
+      if (!selectedAlan) {
+        sonucDiv.textContent = "Lütfen bir alan seçin.";
+        return;
+      }
+
+      // Alan uygunluk mesajlarını göster
+      let message = "";
+      if (selectedAlan === "Alan 1") {
+        message = "Bu bitki türü bu alan için uygun değildir. En yüksek verimi Lahana ile alabilirsiniz.";
+      } else if (selectedAlan === "Alan 2") {
+        message = "Bu bitki türü bu alan için uygun değildir. En yüksek verimi Soğan ile alabilirsiniz.";
+      } else if (selectedAlan === "Alan 3") {
+        message = "Bu bitki bu alan için uygundur. Bir sonraki yıl da aynı ekimle devam edilebilir.";
+      }
+
+      sonucDiv.textContent = message;
+    });
+  </script>
+</body>
+</html>

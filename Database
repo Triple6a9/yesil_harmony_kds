@@ -1,0 +1,65 @@
+import mysql.connector
+import pandas as pd
+
+# MySQL bağlantısı
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="Yesil_Harmony"
+)
+
+cursor = db.cursor()
+
+# 1. Alanları Ekleyelim
+fields = ['Alan 1', 'Alan 2', 'Alan 3']
+for field in fields:
+    cursor.execute("INSERT INTO Fields (FieldName) VALUES (%s)", (field,))
+db.commit()
+
+# 2. Bitkileri Ekleyelim
+plants = {
+    'Alan 1': 'Domates',
+    'Alan 2': 'Biber',
+    'Alan 3': 'Nane'
+}
+
+for field, plant in plants.items():
+    cursor.execute("""
+        INSERT INTO Plants (FieldID, PlantType)
+        VALUES ((SELECT FieldID FROM Fields WHERE FieldName = %s), %s)
+    """, (field, plant))
+db.commit()
+
+# 3. Çevresel Verileri Ekleyelim
+env_df = pd.read_csv('environmental_data.csv')
+
+for _, row in env_df.iterrows():
+    cursor.execute("""
+        INSERT INTO EnvironmentalData (FieldID, DateTime, LightIntensity, Temperature, Humidity, WindSpeed, WaterLevel)
+        VALUES (
+            (SELECT FieldID FROM Fields WHERE FieldName = %s),
+            %s, %s, %s, %s, %s, %s
+        )
+    """, (row['Field'], row['DateTime'], row['LightIntensity'], row['Temperature'],
+          row['Humidity'], row['WindSpeed'], row['WaterLevel']))
+db.commit()
+
+# 4. Büyüme Verilerini Ekleyelim
+growth_df = pd.read_csv('growth_data.csv')
+
+for _, row in growth_df.iterrows():
+    cursor.execute("""
+        INSERT INTO GrowthData (FieldID, PlantType, Date, HeightGrowth, NewLeaves)
+        VALUES (
+            (SELECT FieldID FROM Fields WHERE FieldName = %s),
+            %s, %s, %s, %s
+        )
+    """, (row['Field'], row['PlantType'], row['Date'], row['HeightGrowth'], row['NewLeaves']))
+db.commit()
+
+# Bağlantıyı kapatma
+cursor.close()
+db.close()
+
+print("Veriler başarıyla MySQL'e eklendi!")

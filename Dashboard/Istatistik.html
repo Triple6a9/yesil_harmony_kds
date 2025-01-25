@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İstatistik</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <img src="img/YH_logo.jpeg" alt="logo" id="logo">
+        </div>
+        <div class="menu">
+            <select id="alanDropdown" class="dropdown" onchange="fetchData()">
+                <option value="">Seçiniz</option>
+            </select>
+            <button onclick="window.location.href='/GecmisVeri.html'">GEÇMİŞ VERİLER</button>
+            <button id="Ist" onclick="window.location.href='/Istatistik.html'">İSTATİSTİK</button>
+            <button onclick="window.location.href='/Optimizasyon.html'">OPTİMİZASYON</button>
+        </div>
+        <div id="datetime" class="datetime"></div>
+    </div>
+
+    <div class="content">
+        <div class="chart-container">
+            <h1>Değişim Oranları</h1>
+
+            <div class="card-container">
+
+                <div class="card" id="card1">
+                    <h2>Uzunluk Büyüme</h2>
+                    <div class="chart-container">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card" id="card2">
+                    <h2>Yeni Yaprak</h2>
+                    <div class="chart-container">
+                        <canvas id="leafChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="Main.js"></script>
+
+    <script>
+        // Logo'ya tıklanınca ana sayfaya dönüyor
+        document.getElementById('logo').addEventListener('click', function () {
+            window.location.href = 'index.html';
+        });
+
+        // Global değişkenleri tanımlayın
+        let growthChartInstance = null;
+        let leafChartInstance = null;
+
+        // Alanları doldur ve varsayılan alanı seç
+        const alanDropdown = document.getElementById('alanDropdown');
+
+        fetch('http://localhost:3000/alanlar')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(alan => {
+                    const option = document.createElement('option');
+                    option.value = alan.alanID;
+                    option.textContent = `Alan ${alan.alanID}`;
+                    alanDropdown.appendChild(option);
+                });
+
+                // Varsayılan olarak Alan 1'i seç ve fetchData çağır
+                if (data.length > 0) {
+                    alanDropdown.value = data[0].alanID; 
+                    fetchData(); 
+                }
+            })
+            .catch(error => console.error('Alanları yükleme hatası:', error));
+
+        async function fetchData() {
+            const alanId = alanDropdown.value; 
+            if (!alanId) {
+                console.error('Alan seçilmedi!');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/getData', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ alan_id: alanId }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Veri çekme hatası: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    console.warn('Grafik için uygun veri bulunamadı.');
+                    return;
+                }
+
+                const months = data.map((row) => row.ay);
+                const growthData = data.map((row) => row.uzunluk_buyume);
+                const leafData = data.map((row) => row.yeni_yaprak);
+
+                drawChart('growthChart', 'Uzunluk Büyüme', months, growthData, growthChartInstance, (chart) => growthChartInstance = chart);
+                drawChart('leafChart', 'Yeni Yaprak', months, leafData, leafChartInstance, (chart) => leafChartInstance = chart);
+            } catch (error) {
+                console.error('Veri çekme sırasında hata oluştu:', error);
+            }
+        }
+
+        function drawChart(canvasId, label, labels, data, chartInstance, setChartInstance) {
+            if (chartInstance) {
+                chartInstance.destroy(); 
+            }
+
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const newChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: label,
+                            data: data,
+                            borderColor: 'rgba(60,179,113, 1)',
+                            backgroundColor: 'rgba(46, 139, 87, 0.2)',
+                            borderWidth: 2,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Ay',
+                            },
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Değer',
+                            },
+                            beginAtZero: true,
+                        },
+                    },
+                },
+            });
+
+            setChartInstance(newChart); 
+        }
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #749aa7;
+  }
+  
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .login-box {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px;
+  }
+  
+  .login-box h1 {
+    margin-bottom: 20px;
+    color: #3d6b38;
+  }
+  
+  .input-group {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  
+  .input-group label {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .login-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #3d6b38;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .login-button:hover {
+    background-color: #2f5429;
+  }
+</style>
+<body>
+  <div class="login-container">
+    <div class="login-box">
+      <h1>Giriş Yap</h1>
+      <form id="login-form">
+        <div class="input-group">
+          <label for="username">Kullanıcı Adı</label>
+          <input type="text" id="username" name="username" required>
+        </div>
+        <div class="input-group">
+          <label for="password">Şifre</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <button type="button" class="login-button" onclick="redirectToIndex()">Giriş Yap</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  function redirectToIndex() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+  
+    // Giriş bilgileri kontrolü (örnek doğrulama)
+    if (username === "admin" && password === "1234") {
+      window.location.href = "index.html";
+    } else {
+      // Hatalı giriş, kullanıcıya mesaj göster
+      alert("Kullanıcı adı veya şifre hatalı!");
+    }
+}
+
+function updateDateTime() {
+    const datetimeElement = document.getElementById('datetime');
+    const now = new Date();}
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yeşil_Harmony Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">
+      <img src="img/YH_logo.jpeg" alt="logo" id="logo">
+    </div>  
+    <div class="menu">
+      <select id="alanDropdown" class="dropdown">
+      </select>      
+      <button onclick="window.location.href='/GecmisVeri.html'">GEÇMİŞ VERİLER</button>
+      <button onclick="window.location.href='/Istatistik.html'">İSTATİSTİK</button>  
+      <button onclick="window.location.href='/Optimizasyon.html'">OPTİMİZASYON</button>    
+    </div>
+    <div id="datetime" class="datetime"></div>
+  </div>
+  
+  <div class="content">
+    <div class="section" id="cam">
+        <h2>Cam</h2>
+        <div id="cam_rec"><p>► Not Active</p></div>
+    </div>
+
+    <div class="section" id="veri">
+      <h2>Çevresel Veriler</h2>
+      <div class="chart">
+        <img id="chartImage" src="img/Alan 1.png" alt="Çevresel Veriler" /> <!-- Varsayılan olarak Alan 1 fotoğrafı -->
+      </div>
+    </div>    
+  </div>
+
+  <script src="Main.js"></script>
+  <script>
+    // Dropdown'dan veri çekme ve fotoğrafı değiştirme işlemi
+    fetch('/get-alanlar')
+      .then((response) => response.json())
+      .then((data) => {
+        const dropdown = document.getElementById('alanDropdown');
+        const chartImage = document.getElementById('chartImage'); // Fotoğrafı değiştirecek element
+
+        // Dropdown seçeneklerini ekle
+        data.forEach((item) => {
+          const option = document.createElement('option');
+          option.textContent = item.alan_adi; 
+          option.value = item.alan_adi; 
+          dropdown.appendChild(option);
+        });
+
+        const defaultImage = 'img/Alan 1.png'; 
+        chartImage.src = defaultImage;
+
+        dropdown.addEventListener('change', function() {
+          const selectedAlan = dropdown.value;
+
+          if (selectedAlan === 'Alan 1') {
+            chartImage.src = 'img/Alan 1.png';
+          } else if (selectedAlan === 'Alan 2') {
+            chartImage.src = 'img/Alan 2.png';
+          } else if (selectedAlan === 'Alan 3') {
+            chartImage.src = 'img/Alan 3.png';
+          }
+        });
+      })
+      .catch((error) => console.error('Hata:', error));
+  </script>
+
+  <script>
+  document.getElementById('logo').addEventListener('click', function() {
+  window.location.href = 'index.html'; 
+  });
+  </script>
+
+</body>
+</html>
